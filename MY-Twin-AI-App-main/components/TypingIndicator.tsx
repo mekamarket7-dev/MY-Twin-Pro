@@ -1,5 +1,6 @@
-import { useEffect, useRef } from 'react';
+import React from 'react';
 import { View, Animated, StyleSheet, Text } from 'react-native';
+import { useEffect, useRef } from 'react';
 import { COLORS, FONTS } from '../utils/theme';
 
 interface TypingIndicatorProps {
@@ -7,32 +8,24 @@ interface TypingIndicatorProps {
   assistantName?: string;
 }
 
-export default function TypingIndicator({ lang = 'ar', assistantName }: TypingIndicatorProps) {
+const TypingIndicator = React.memo(({ lang = 'ar', assistantName }: TypingIndicatorProps) => {
   const displayName = assistantName || (lang === 'ar' ? 'التوأم' : 'Twin');
+  const isRTL = lang === 'ar';
 
-  // 1️⃣ إنشاء مصفوفة dots مرة واحدة فقط
+  // dots once
   const dots = useRef([
     new Animated.Value(0),
     new Animated.Value(0),
     new Animated.Value(0),
   ]).current;
 
-  // 2️⃣ إضافة dots كتبعية
   useEffect(() => {
     const animations = dots.map((dot, i) =>
       Animated.loop(
         Animated.sequence([
           Animated.delay(i * 200),
-          Animated.timing(dot, {
-            toValue: 1,
-            duration: 400,
-            useNativeDriver: true,
-          }),
-          Animated.timing(dot, {
-            toValue: 0,
-            duration: 400,
-            useNativeDriver: true,
-          }),
+          Animated.timing(dot, { toValue: 1, duration: 400, useNativeDriver: true }),
+          Animated.timing(dot, { toValue: 0, duration: 400, useNativeDriver: true }),
         ])
       )
     );
@@ -40,11 +33,14 @@ export default function TypingIndicator({ lang = 'ar', assistantName }: TypingIn
     return () => animations.forEach((a) => a.stop());
   }, [dots]);
 
-  // 3️⃣ دعم RTL: في العربية نعكس الصف
-  const isRTL = lang === 'ar';
+  // pre-calc interpolation
+  const getOpacity = (dot: Animated.Value) =>
+    dot.interpolate({ inputRange: [0, 1], outputRange: [0.3, 1] });
+  const getTranslateY = (dot: Animated.Value) =>
+    dot.interpolate({ inputRange: [0, 1], outputRange: [0, -6] });
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} accessibilityLabel={lang === 'ar' ? 'التوأم يكتب' : 'Typing indicator'} accessibilityRole="progressbar">
       <View style={[styles.bubble, isRTL && styles.bubbleRTL]}>
         <View style={[styles.dotsRow, isRTL && styles.dotsRowRTL]}>
           {dots.map((dot, i) => (
@@ -53,32 +49,24 @@ export default function TypingIndicator({ lang = 'ar', assistantName }: TypingIn
               style={[
                 styles.dot,
                 {
-                  opacity: dot.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [0.3, 1],
-                  }),
-                  transform: [
-                    {
-                      translateY: dot.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [0, -6],
-                      }),
-                    },
-                  ],
+                  opacity: getOpacity(dot),
+                  transform: [{ translateY: getTranslateY(dot) }],
                 },
               ]}
             />
           ))}
         </View>
         <Text style={styles.text}>
-          {lang === 'ar'
-            ? `${displayName} يكتب...`
-            : `${displayName} is typing...`}
+          {lang === 'ar' ? `${displayName} يكتب...` : `${displayName} is typing...`}
         </Text>
       </View>
     </View>
   );
-}
+});
+
+TypingIndicator.displayName = 'TypingIndicator';
+
+export default TypingIndicator;
 
 const styles = StyleSheet.create({
   container: {
@@ -101,11 +89,11 @@ const styles = StyleSheet.create({
   },
   dotsRow: {
     flexDirection: 'row',
-    marginRight: 8,
+    marginEnd: 8,
   },
   dotsRowRTL: {
-    marginRight: 0,
-    marginLeft: 8,
+    marginEnd: 0,
+    marginStart: 8,
   },
   dot: {
     width: 6,
