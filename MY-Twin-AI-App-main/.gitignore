@@ -1,0 +1,47 @@
+# --- التبعيات (Dependencies) ---
+node_modules/
+
+# --- مجلدات Expo المؤقتة (Build outputs) ---
+.expo/
+dist/
+web-build/
+
+# --- الملفات الحساسة (Secrets & Environment) ---
+.env
+.env.*
+!.env.example          # نستثني ملف المثال
+backend/.env
+backend/.env.*
+
+# --- شهادات التوقيع (Signing keys) ---
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# --- ملفات نظام التشغيل (OS generated files) ---
+.DS_Store
+Thumbs.db
+
+# --- ملفات السجلات (Logs) ---
+*.log
+
+# --- مجلدات الـ Python المؤقتة ---
+backend/__pycache__/
+backend/*.pyc
+backend/*.pyo
+backend/venv/
+backend/env/
+
+# --- محرر الأكواد (Editor settings) ---
+.vscode/
+.idea/
+
+# --- Supabase CLI محلي ---
+supabase/.branches/
+supabase/.temp/
+.env
+.env.local
+.env.production
+.env

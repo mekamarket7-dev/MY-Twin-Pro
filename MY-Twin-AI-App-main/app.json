@@ -1,0 +1,92 @@
+{
+  "expo": {
+    "name": "MyTwin",
+    "slug": "my-twin-final",
+    "scheme": "mytwin",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFFFFF"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.soulsync.mytwin",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "يحتاج التطبيق للميكروفون للمحادثات الصوتية.",
+        "NSLocationWhenInUseUsageDescription": "يستخدم الموقع لتحسين تجربة التوأم.",
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.mohamed101.mytwinpro",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "permissions": [
+        "RECORD_AUDIO",
+        "VIBRATE",
+        "ACCESS_FINE_LOCATION",
+        "RECEIVE_BOOT_COMPLETED",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "com.android.vending.BILLING"
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-secure-store",
+      [
+        "expo-av",
+        {
+          "microphonePermission": "يحتاج التطبيق للميكروفون للمحادثات الصوتية."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#6B21A8"
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "useFrameworks": "static",
+            "kotlinVersion": "1.9.24",
+            "compileSdkVersion": 34,
+            "targetSdkVersion": 34,
+            "minSdkVersion": 23
+          },
+          "ios": {
+            "deploymentTarget": "15.1"
+          }
+        }
+      ],
+      "expo-localization"
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "88b920cd-0f02-4dac-85a9-724ea9282879"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/b5e2baa3-6015-40a5-9f31-115298d3b0c9"
+    },
+    "owner": "soulsync.co"
+  }
+}

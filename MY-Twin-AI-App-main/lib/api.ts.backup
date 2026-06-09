@@ -1,0 +1,106 @@
+import axios, { AxiosError } from 'axios';
+import { Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const BASE_URL = process.env.EXPO_PUBLIC_API_URL || 
+  (Platform.OS === 'android' 
+      ? 'http://10.0.2.2:8000' 
+          : 'http://localhost:8000');
+
+          export const API = axios.create({
+            baseURL: BASE_URL,
+              timeout: 30000,           // زيادة للـ AI responses
+                headers: {
+                    'Content-Type': 'application/json',
+                      },
+                      });
+
+                      // Token Management
+                      let _token = '';
+
+                      export function setToken(token: string) {
+                        _token = token;
+                        }
+
+                        API.interceptors.request.use(async (config) => {
+                          if (_token) {
+                              config.headers.Authorization = `Bearer ${_token}`;
+                                } else {
+                                    try {
+                                          const session = await AsyncStorage.getItem('supabase.auth.token');
+                                                if (session) {
+                                                        const parsed = JSON.parse(session);
+                                                                const token = parsed?.access_token || parsed?.currentSession?.access_token;
+                                                                        if (token) {
+                                                                                  config.headers.Authorization = `Bearer ${token}`;
+                                                                                          }
+                                                                                                }
+                                                                                                    } catch (e) {
+                                                                                                          console.warn('Failed to get token from AsyncStorage');
+                                                                                                              }
+                                                                                                                }
+                                                                                                                  return config;
+                                                                                                                  });
+
+                                                                                                                  // Response Interceptor للـ Error Handling
+                                                                                                                  API.interceptors.response.use(
+                                                                                                                    (response) => response,
+                                                                                                                      (error: AxiosError) => {
+                                                                                                                          console.error('API Error:', {
+                                                                                                                                status: error.response?.status,
+                                                                                                                                      data: error.response?.data,
+                                                                                                                                            url: error.config?.url,
+                                                                                                                                                });
+
+                                                                                                                                                    // يمكن إضافة Refresh Token Logic هنا لاحقاً
+                                                                                                                                                        return Promise.reject(error);
+                                                                                                                                                          }
+                                                                                                                                                          );
+
+                                                                                                                                                          // ====================== Types ======================
+                                                                                                                                                          export interface ChatRequest {
+                                                                                                                                                            message: string;
+  twin_name: string;
+  bond_level: number;
+  relationship_dims: any;
+  chat_history?: any[];
+  current_emotion?: string;
+  calm_mode?: boolean;
+  timestamp?: string;
+  message_count?: number;
+  user_context?: {
+    age?: number;
+    interests?: string[];
+    personality?: string;
+  };
+}
+
+export interface ChatResponse {
+  reply: string;
+  new_bond: number;
+  emotion?: {
+    primary: string;
+    intensity: number;
+    secondary?: string[];
+  };
+  suggested_action?: string;
+}
+                                                                                                                                                                                                                                                                                                                                                const { data } = await API.post('/api/trial/start', {
+                                                                                                                                                                                                                                                                                                                                                    email,
+                                                                                                                                                                                                                                                                                                                                                        phone,
+                                                                                                                                                                                                                                                                                                                                                            device_id: deviceId,
+                                                                                                                                                                                                                                                                                                                                                              });
+                                                                                                                                                                                                                                                                                                                                                                return data;
+                                                                                                                                                                                                                                                                                                                                                                };
+
+                                                                                                                                                                                                                                                                                                                                                                // لاحقاً: Voice Transcription API
+                                                                                                                                                                                                                                                                                                                                                                export const transcribeAudio = async (audioUri: string) => {
+                                                                                                                                                                                                                                                                                                                                                                  // هيتم تنفيذه بعدين
+                                                                                                                                                                                                                                                                                                                                                                  };
+
+                                                                                                                                                                                                                                                                                                                                                                  // لاحقاً: Save Long-term Memory
+                                                                                                                                                                                                                                                                                                                                                                  export const saveMemory = async (memory: any) => {
+                                                                                                                                                                                                                                                                                                                                                                    return API.post('/api/memory/save', memory);
+                                                                                                                                                                                                                                                                                                                                                                    };
+
+                                                                                                                                                                                                                                                                                                                                                                    export default API;
