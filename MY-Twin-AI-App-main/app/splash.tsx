@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import {
-  View, StyleSheet, Animated, ActivityIndicator, Text, Dimensions, SafeAreaView
-} from 'react-native';
+import { View, StyleSheet, Animated, ActivityIndicator, Text, Dimensions, SafeAreaView } from 'react-native';
 import { router } from 'expo-router';
 import { supabase } from '../lib/supabase';
 import { useTwinStore } from '../store/useTwinStore';
@@ -26,34 +24,16 @@ export default function SplashScreen() {
     // بدء الأنيميشن
     animRef.current = Animated.sequence([
       Animated.parallel([
-        Animated.spring(scaleAnim, {
-          toValue: 1,
-          tension: 8,
-          friction: 3,
-          useNativeDriver: true,
-        }),
-        Animated.timing(opacityAnim, {
-          toValue: 1,
-          duration: 800,
-          useNativeDriver: true,
-        }),
+        Animated.spring(scaleAnim, { toValue: 1, tension: 8, friction: 3, useNativeDriver: true }),
+        Animated.timing(opacityAnim, { toValue: 1, duration: 800, useNativeDriver: true }),
       ]),
       Animated.parallel([
-        Animated.timing(textOpacity, {
-          toValue: 1,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-        Animated.timing(subTextOpacity, {
-          toValue: 1,
-          duration: 400,
-          useNativeDriver: true,
-        }),
+        Animated.timing(textOpacity, { toValue: 1, duration: 500, useNativeDriver: true }),
+        Animated.timing(subTextOpacity, { toValue: 1, duration: 400, useNativeDriver: true }),
       ]),
     ]);
     animRef.current.start();
 
-    // بدء التحقق من الجلسة فوراً بالتوازي
     const isAr = useTwinStore.getState().lang === 'ar';
     const texts = {
       checking: isAr ? 'جارٍ الاتصال بتوأمك...' : 'Connecting to your Twin...',
@@ -136,17 +116,11 @@ export default function SplashScreen() {
             ]}
             resizeMode="contain"
           />
-          <Animated.Text style={[styles.appName, { opacity: textOpacity }, isDark && { color: '#D8B4FE' }]}>
-            MyTwin
+          <Animated.Text style={[styles.companyName, { opacity: textOpacity }, isDark && { color: '#D8B4FE' }]}>
+            Soul Sync
           </Animated.Text>
-          <Animated.Text style={[styles.tagline, { opacity: subTextOpacity }, isDark && { color: '#A78BFA' }]}>
-            {useTwinStore.getState().lang === 'ar' ? 'رفيقك الذكي دائماً 💜' : 'Your AI Companion Always 💜'}
-          </Animated.Text>
-          <Animated.Text style={[styles.company, { opacity: textOpacity }, isDark && { color: '#9B7FC7' }]}>
-            BY SOULSYNC
-          </Animated.Text>
-          <Animated.Text style={[styles.copyright, { opacity: subTextOpacity }, isDark && { color: '#9B7FC7' }]}>
-            2026©
+          <Animated.Text style={[styles.copyright, { opacity: subTextOpacity }, isDark && { color: '#A78BFA' }]}>
+            ©2026
           </Animated.Text>
         </View>
 
@@ -175,27 +149,15 @@ const styles = StyleSheet.create({
     height: Math.min(SCREEN_WIDTH * 0.5, 240),
     marginBottom: 16,
   },
-  appName: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: '#6B21A8',
-    letterSpacing: 2,
-    marginBottom: 6,
-  },
-  tagline: {
-    fontSize: 15,
-    color: '#9B7FC7',
-    marginBottom: 16,
-    fontWeight: '500',
-  },
-  company: {
-    fontSize: 16,
+  companyName: {
+    fontSize: 24,
     fontWeight: '700',
     color: '#6B21A8',
     letterSpacing: 2,
-    marginBottom: 4,
+    marginBottom: 6,
+    textTransform: 'uppercase',
   },
-  copyright: { fontSize: 12, color: '#9B7FC7', letterSpacing: 1 },
+  copyright: { fontSize: 13, color: '#9B7FC7', letterSpacing: 1 },
   loadingRow: {
     flexDirection: 'row',
     alignItems: 'center',

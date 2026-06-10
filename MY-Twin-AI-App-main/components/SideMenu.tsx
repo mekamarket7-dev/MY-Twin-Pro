@@ -38,7 +38,8 @@ export default function SideMenu({ onClose }: { onClose: () => void }) {
   const isDark = theme === 'dark';
   const t = (ar: string, en: string) => isAr ? ar : en;
 
-  const navigate = (route: string) => { router.replace(route as Href); onClose(); };
+  // استخدام push بدلاً من replace للسماح بـ router.back()
+  const navigate = (route: string) => { router.push(route as Href); onClose(); };
   const startNewChat = () => { clearHistory(); onClose(); navigate('/chat'); };
 
   const handleLogout = () => {
@@ -151,10 +152,4 @@ const styles = StyleSheet.create({
   itemRTL: { flexDirection: 'row-reverse' },
   activeItem: { backgroundColor: '#F3F0FF', borderLeftWidth: 3, borderLeftColor: '#A855F7' },
   itemLabel: { fontSize: 15, fontWeight: '500' },
-  vitalSection: { borderTopWidth: 1, borderBottomWidth: 1, paddingVertical: 16, marginBottom: 16 },
-  vitalRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 },
-  vitalLabel: { fontSize: 13, flex: 1 },
-  vitalValue: { fontSize: 14, fontWeight: '700' },
-  progressBar: { height: 6, borderRadius: 3, overflow: 'hidden' },
-  progressFill: { height: '100%', borderRadius: 3 },
 });
