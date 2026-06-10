@@ -12,7 +12,7 @@ const STAGES = [
   { label_ar: 'توأم روح', label_en: 'Soulmates', min: 90 },
 ];
 
-const DIMENSIONS = [
+const DIMENSIONS: { key: keyof import('../store/useTwinStore').RelationshipDims; label_ar: string; label_en: string; icon: any; color: string }[] = [
   { key: 'trust', label_ar: 'ثقة', label_en: 'Trust', icon: Shield, color: '#3B82F6' },
   { key: 'affection', label_ar: 'مودة', label_en: 'Affection', icon: Heart, color: '#EC4899' },
   { key: 'dependency', label_ar: 'اعتمادية', label_en: 'Dependency', icon: Users, color: '#F59E0B' },
@@ -21,7 +21,7 @@ const DIMENSIONS = [
   { key: 'support', label_ar: 'دعم', label_en: 'Support', icon: Handshake, color: '#6366F1' },
 ];
 
-function getRelationshipSummary(bondLevel: number, dims: Record<string, number>, isAr: boolean) {
+function getRelationshipSummary(bondLevel: number, dims: any, isAr: boolean) {
   const trust = dims.trust || 0;
   const affection = dims.affection || 0;
   const empathy = dims.empathy || 0;
@@ -59,7 +59,6 @@ export default function BondTimeline() {
 
   return (
     <View style={[styles.container, isDark && { backgroundColor: '#1A1A1A' }]}>
-      {/* الشريط الرئيسي */}
       <View style={styles.mainBarSection}>
         <View style={styles.mainBarHeader}>
           <Text style={[styles.stageLabel, { color: isDark ? '#FFF' : '#1A1A1A' }]}>
@@ -73,13 +72,12 @@ export default function BondTimeline() {
         <Text style={[styles.summary, { color: isDark ? '#CCC' : '#666' }]}>{summary}</Text>
       </View>
 
-      {/* الأبعاد */}
       <Text style={[styles.dimTitle, { color: isDark ? '#FFF' : '#1A1A1A' }]}>
         {isAr ? 'أبعاد العلاقة' : 'Relationship Dimensions'}
       </Text>
       {DIMENSIONS.map((d) => {
-        const value = dims[d.key as keyof typeof dims] || 0;
         const Icon = d.icon;
+        const value = (dims as any)[d.key] || 0;
         return (
           <View key={d.key} style={styles.dimRow}>
             <Icon size={16} stroke={d.color} />

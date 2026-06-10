@@ -101,7 +101,6 @@ export async function initAnalytics(): Promise<boolean> {
         captureMode: 'json',
         flushAt: 5,
         flushInterval: 5000,
-        enableRecording: false, // لا تسجيل للجلسات افتراضياً
       });
 
       // انتظار جاهزية PostHog

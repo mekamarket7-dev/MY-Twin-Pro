@@ -14,9 +14,14 @@ export interface ChatMessage {
   failed?: boolean;
 }
 
+// ✅ بدون [key: string]: number لتجنب تعارض Partial
 export interface RelationshipDims {
-  trust: number; empathy: number; humor: number;
-  support: number; affection: number; dependency: number;
+  trust: number;
+  empathy: number;
+  humor: number;
+  support: number;
+  affection: number;
+  dependency: number;
 }
 
 export type Tier = 'free' | 'free_trial_14d' | 'premium_trial' | 'premium' | 'pro' | 'yearly' | 'plus';
@@ -60,7 +65,7 @@ const initialState = {
   twinStyle: 'supportive' as TwinStyle,
   bondLevel: 0,
   energy: 50,
-  relationshipDims: { trust: 0, empathy: 0, humor: 0, support: 0, affection: 0, dependency: 0 },
+  relationshipDims: { trust: 0, empathy: 0, humor: 0, support: 0, affection: 0, dependency: 0 } as RelationshipDims,
   chatHistory: [] as ChatMessage[],
   calmMode: false,
   theme: 'light' as Theme,
