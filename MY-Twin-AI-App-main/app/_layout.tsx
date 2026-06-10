@@ -9,12 +9,12 @@ import { ToastProvider } from "../components/Toast";
 import { ErrorBoundary } from "../components/ErrorBoundary";
 
 export default function Layout() {
-  const theme = useTwinStore(s => s.theme);
-  const menuVisible = useTwinStore(s => s.menuVisible);
-  const closeMenu = useTwinStore(s => s.closeMenu);
-  const lang = useTwinStore(s => s.lang); // ✅ أضفنا lang لتمريره
+  const theme = useTwinStore((s) => s.theme);
+  const menuVisible = useTwinStore((s) => s.menuVisible);
+  const closeMenu = useTwinStore((s) => s.closeMenu);
+  const lang = useTwinStore((s) => s.lang);
   const isDark = theme === 'dark';
-  
+
   const slideAnim = useRef(new Animated.Value(-300)).current;
   const { width } = useWindowDimensions();
   const drawerWidth = width * 0.8;
@@ -22,7 +22,10 @@ export default function Layout() {
   useEffect(() => {
     let cancelled = false;
     const setup = async () => {
-      if (!cancelled) await initAnalytics();
+      if (!cancelled) {
+        await initAnalytics();
+        console.log('Analytics ready');
+      }
     };
     setup();
     return () => { cancelled = true; };

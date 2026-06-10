@@ -222,6 +222,7 @@ class TwinBrain:
             "journey_phase": journey_info.get("phase"),
             "journey_day": journey_info.get("day"),
             "attachment_style": attachment_info.get("style"),
+            "relationship_dims": self.relationship.dims,  # ✅ الأبعاد الحية
         }
 
     async def respond_stream(
@@ -283,4 +284,4 @@ class TwinBrain:
 
 # نسخة عالمية
 twin_brain = TwinBrain()
-print("✅ Twin Brain v4.1 | EmotionalStateTracker متوافق | جاهز")
+print("✅ Twin Brain v4.1 | EmotionalStateTracker متوافق | relationship_dims تُرجع | جاهز")
