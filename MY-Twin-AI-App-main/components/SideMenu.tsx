@@ -7,17 +7,17 @@ import { useMemo } from 'react';
 import {
   Home, MessageCircle, History, User, BrainCircuit, Palette,
   Diamond, Settings, HelpCircle, LogOut, X, PlusCircle, Gift,
-  Sparkles, BatteryFull, BatteryMedium, BatteryLow, Heart
+  Sparkles, BatteryFull, BatteryMedium, BatteryLow, Heart, ArrowRight
 } from 'lucide-react-native';
 
 const TIER_LABELS: Record<string, { ar: string; en: string }> = {
-  free:             { ar: 'مجاني', en: 'Free' },
-  free_trial_14d:   { ar: 'تجربة مجانية', en: 'Free Trial' },
-  premium_trial:    { ar: 'تجربة مميزة', en: 'Premium Trial' },
-  plus:             { ar: 'Plus', en: 'Plus' },
-  premium:          { ar: 'Premium', en: 'Premium' },
-  pro:              { ar: 'Pro', en: 'Pro' },
-  yearly:           { ar: 'سنوي', en: 'Yearly' },
+  free: { ar: 'مجاني', en: 'Free' },
+  free_trial_14d: { ar: 'تجربة مجانية', en: 'Free Trial' },
+  premium_trial: { ar: 'تجربة مميزة', en: 'Premium Trial' },
+  plus: { ar: 'Plus', en: 'Plus' },
+  premium: { ar: 'Premium', en: 'Premium' },
+  pro: { ar: 'Pro', en: 'Pro' },
+  yearly: { ar: 'سنوي', en: 'Yearly' },
 };
 
 const getEnergyColor = (val: number) => {
@@ -29,8 +29,7 @@ const getEnergyColor = (val: number) => {
 export default function SideMenu({ onClose }: { onClose: () => void }) {
   const insets = useSafeAreaInsets();
   const pathname = usePathname();
-
-  const { lang, theme, twinName, bondLevel, energy, tier, clearHistory } = useTwinStore((s) => ({
+  const { lang, theme, twinName, bondLevel, energy, tier, clearHistory } = useTwinStore(s => ({
     lang: s.lang, theme: s.theme, twinName: s.twinName,
     bondLevel: s.bondLevel, energy: s.energy, tier: s.tier, clearHistory: s.clearHistory,
   }));
@@ -55,16 +54,16 @@ export default function SideMenu({ onClose }: { onClose: () => void }) {
   };
 
   const items = useMemo(() => [
-    { icon: Home,          label: t('الرئيسية','Home'), route: '/chat' },
-    { icon: PlusCircle,    label: t('دردشة جديدة','New Chat'), onPress: startNewChat, isAction: true },
-    { icon: Heart,         label: t('علاقتي','My Relationship'), route: '/relationship' },
-    { icon: History,       label: t('سجل المحادثات','History'), route: '/history' },
-    { icon: User,          label: t('الملف الشخصي','Profile'), route: '/profile' },
-    { icon: BrainCircuit,  label: t('ذكريات','Memories'), route: '/memories' },
-    { icon: Palette,       label: t('تخصيص','Customize'), route: '/customize' },
-    { icon: Diamond,       label: t('الاشتراكات','Subscription'), route: '/subscription' },
-    { icon: Gift,          label: t('الإحالة','Referral'), route: '/referral' },
-    { icon: Settings,      label: t('الإعدادات','Settings'), route: '/settings' },
+    { icon: Home, label: t('الرئيسية', 'Home'), route: '/chat' },
+    { icon: PlusCircle, label: t('دردشة جديدة', 'New Chat'), onPress: startNewChat },
+    { icon: Heart, label: t('علاقتي', 'My Relationship'), route: '/relationship' },
+    { icon: History, label: t('سجل المحادثات', 'History'), route: '/history' },
+    { icon: User, label: t('الملف الشخصي', 'Profile'), route: '/profile' },
+    { icon: BrainCircuit, label: t('ذكريات', 'Memories'), route: '/memories' },
+    { icon: Palette, label: t('تخصيص', 'Customize'), route: '/customize' },
+    { icon: Diamond, label: t('الاشتراكات', 'Subscription'), route: '/subscription' },
+    { icon: Gift, label: t('الإحالة', 'Referral'), route: '/referral' },
+    { icon: Settings, label: t('الإعدادات', 'Settings'), route: '/settings' },
   ], [isAr, t]);
 
   const energyIcon = useMemo(() => {
@@ -75,7 +74,6 @@ export default function SideMenu({ onClose }: { onClose: () => void }) {
   }, [energy]);
 
   const tierLabel = TIER_LABELS[tier] || TIER_LABELS.free;
-
   const colors = {
     bg: isDark ? '#1A1A1A' : '#FFFFFF',
     border: isDark ? '#333' : '#E8E8E3',
@@ -89,11 +87,12 @@ export default function SideMenu({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <ScrollView style={[styles.container, { paddingTop: insets.top + 20, backgroundColor: colors.bg }]} contentContainerStyle={{ paddingBottom: 40 }} keyboardShouldPersistTaps="handled" accessibilityRole="menu">
-      <TouchableOpacity style={styles.closeBtn} onPress={onClose} accessibilityLabel={t('إغلاق القائمة', 'Close menu')} accessibilityRole="button">
+    <ScrollView style={[styles.container, { paddingTop: insets.top + 20, backgroundColor: colors.bg }]} contentContainerStyle={{ paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
+      <TouchableOpacity style={styles.closeBtn} onPress={onClose} accessibilityLabel={t('إغلاق القائمة', 'Close menu')}>
         <X size={24} stroke={colors.primary} />
       </TouchableOpacity>
 
+      {/* بطاقة المستخدم */}
       <View style={[styles.userCard, { borderBottomColor: colors.border }]}>
         <View style={styles.avatar}><Sparkles size={28} stroke={colors.accent} /></View>
         <View style={{ flex: 1, marginStart: isAr ? 12 : 0, marginEnd: isAr ? 0 : 12 }}>
@@ -106,36 +105,32 @@ export default function SideMenu({ onClose }: { onClose: () => void }) {
         </View>
       </View>
 
-      <View style={[styles.vitalSection, { borderColor: colors.border }]}>
-        <View style={styles.vitalRow}>
-          {energyIcon}
-          <Text style={[styles.vitalLabel, { color: colors.subtext }]}>{t('طاقة التوأم', 'Twin Energy')}</Text>
-          <Text style={[styles.vitalValue, { color: colors.primary }]}>{Math.round(energy)}%</Text>
-        </View>
-        <View style={[styles.progressBar, { backgroundColor: isDark ? '#444' : '#F0F0F0' }]}>
-          <View style={[styles.progressFill, { width: `${Math.min(energy, 100)}%`, backgroundColor: colors.energyFill }]} />
-        </View>
-      </View>
+      {/* زر الرجوع السريع للدردشة */}
+      <TouchableOpacity style={[styles.backToChatBtn, isDark && { backgroundColor: '#A855F722' }]} onPress={() => navigate('/chat')}>
+        <ArrowRight size={18} stroke={colors.accent} />
+        <Text style={[styles.backToChatText, { color: colors.accent }]}>{t('العودة للمحادثة', 'Back to Chat')}</Text>
+      </TouchableOpacity>
 
+      {/* عناصر القائمة */}
       {items.map((item) => {
         const Icon = item.icon;
         const active = item.route ? isActive(item.route) : false;
         const onPress = item.onPress || (() => navigate(item.route!));
         return (
-          <TouchableOpacity key={item.route || item.label} style={[styles.item, isAr && styles.itemRTL, active && styles.activeItem]} onPress={onPress} accessibilityLabel={item.label} accessibilityRole="menuitem" accessibilityState={{ selected: active }}>
+          <TouchableOpacity key={item.route || item.label} style={[styles.item, isAr && styles.itemRTL, active && styles.activeItem]} onPress={onPress} accessibilityLabel={item.label}>
             <Icon size={20} stroke={active ? colors.accent : colors.primary} />
             <Text style={[styles.itemLabel, { color: colors.text }, active && { color: colors.accent, fontWeight: '600' }]}>{item.label}</Text>
           </TouchableOpacity>
         );
       })}
 
-      <TouchableOpacity style={[styles.item, isAr && styles.itemRTL]} onPress={() => navigate('/help')} accessibilityLabel={t('مساعدة', 'Help')} accessibilityRole="menuitem">
+      <TouchableOpacity style={[styles.item, isAr && styles.itemRTL]} onPress={() => navigate('/help')} accessibilityLabel={t('مساعدة', 'Help')}>
         <HelpCircle size={20} stroke={colors.primary} />
-        <Text style={[styles.itemLabel, { color: colors.text }]}>{t('مساعدة','Help')}</Text>
+        <Text style={[styles.itemLabel, { color: colors.text }]}>{t('مساعدة', 'Help')}</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={[styles.item, isAr && styles.itemRTL, { marginTop: 20 }]} onPress={handleLogout} accessibilityLabel={t('تسجيل الخروج', 'Logout')} accessibilityRole="menuitem">
+      <TouchableOpacity style={[styles.item, isAr && styles.itemRTL, { marginTop: 20 }]} onPress={handleLogout} accessibilityLabel={t('تسجيل الخروج', 'Logout')}>
         <LogOut size={20} stroke={colors.danger} />
-        <Text style={[styles.itemLabel, { color: colors.danger }]}>{t('تسجيل الخروج','Logout')}</Text>
+        <Text style={[styles.itemLabel, { color: colors.danger }]}>{t('تسجيل الخروج', 'Logout')}</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -150,14 +145,16 @@ const styles = StyleSheet.create({
   bondRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 },
   bondValue: { fontSize: 12, fontWeight: '500' },
   tierText: { fontSize: 12, fontWeight: '500', marginTop: 2 },
+  backToChatBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 12, borderRadius: 10, backgroundColor: '#F3F0FF', marginBottom: 16 },
+  backToChatText: { fontSize: 15, fontWeight: '600' },
+  item: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14, borderRadius: 12, marginBottom: 2 },
+  itemRTL: { flexDirection: 'row-reverse' },
+  activeItem: { backgroundColor: '#F3F0FF', borderLeftWidth: 3, borderLeftColor: '#A855F7' },
+  itemLabel: { fontSize: 15, fontWeight: '500' },
   vitalSection: { borderTopWidth: 1, borderBottomWidth: 1, paddingVertical: 16, marginBottom: 16 },
   vitalRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 },
   vitalLabel: { fontSize: 13, flex: 1 },
   vitalValue: { fontSize: 14, fontWeight: '700' },
   progressBar: { height: 6, borderRadius: 3, overflow: 'hidden' },
   progressFill: { height: '100%', borderRadius: 3 },
-  item: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14, borderRadius: 12, marginBottom: 2 },
-  itemRTL: { flexDirection: 'row-reverse' },
-  activeItem: { backgroundColor: '#F3F0FF', borderLeftWidth: 3, borderLeftColor: '#A855F7' },
-  itemLabel: { fontSize: 15, fontWeight: '500' },
 });

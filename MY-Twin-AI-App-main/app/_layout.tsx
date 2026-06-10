@@ -1,20 +1,36 @@
-import { Stack } from "expo-router";
+import { Stack, useRouter, usePathname } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useRef } from "react";
-import { Pressable, StyleSheet, Animated, Modal, useWindowDimensions } from "react-native";
+import { useEffect, useRef, useMemo } from "react";
+import { Pressable, StyleSheet, Animated, Modal, useWindowDimensions, TouchableOpacity, Text } from "react-native";
 import { useTwinStore } from "../store/useTwinStore";
 import { initAnalytics } from "../lib/analytics";
 import SideMenu from "../components/SideMenu";
 import { ToastProvider } from "../components/Toast";
 import { ErrorBoundary } from "../components/ErrorBoundary";
 
-export default function Layout() {
-  const theme = useTwinStore((s) => s.theme);
-  const menuVisible = useTwinStore((s) => s.menuVisible);
-  const closeMenu = useTwinStore((s) => s.closeMenu);
-  const lang = useTwinStore((s) => s.lang);
+function BackButton() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const { theme } = useTwinStore();
   const isDark = theme === 'dark';
 
+  if (pathname === '/chat' || pathname === '/splash' || pathname === '/login' || pathname === '/onboarding' || pathname === '/') {
+    return null;
+  }
+
+  return (
+    <TouchableOpacity onPress={() => router.back()} style={{ padding: 8 }}>
+      <Text style={{ color: isDark ? '#FFF' : '#1A1A1A', fontSize: 16, fontWeight: '600' }}>← رجوع</Text>
+    </TouchableOpacity>
+  );
+}
+
+export default function Layout() {
+  const theme = useTwinStore(s => s.theme);
+  const menuVisible = useTwinStore(s => s.menuVisible);
+  const closeMenu = useTwinStore(s => s.closeMenu);
+  const lang = useTwinStore(s => s.lang);
+  const isDark = theme === 'dark';
   const slideAnim = useRef(new Animated.Value(-300)).current;
   const { width } = useWindowDimensions();
   const drawerWidth = width * 0.8;
@@ -22,10 +38,7 @@ export default function Layout() {
   useEffect(() => {
     let cancelled = false;
     const setup = async () => {
-      if (!cancelled) {
-        await initAnalytics();
-        console.log('Analytics ready');
-      }
+      if (!cancelled) await initAnalytics();
     };
     setup();
     return () => { cancelled = true; };
@@ -40,34 +53,34 @@ export default function Layout() {
     }).start();
   }, [menuVisible, drawerWidth]);
 
+  // إعدادات الشاشة مع تجنب الخيارات غير المتوافقة
+  const screenOptions = useMemo(() => ({
+    headerShown: true,
+    headerStyle: { backgroundColor: isDark ? '#1A1A1A' : '#F8F6F2' },
+    headerTitleStyle: { color: isDark ? '#FFF' : '#1A1A1A', fontSize: 18, fontWeight: 'bold' as const },
+    headerLeft: () => <BackButton />,
+    headerShadowVisible: false,
+    contentStyle: { backgroundColor: isDark ? '#1A1A1A' : '#F8F6F2' },
+    // إزالة animation لتفادي خطأ النوع
+  }), [isDark]);
+
   return (
     <ErrorBoundary lang={lang}>
       <ToastProvider>
         <StatusBar style={isDark ? "light" : "dark"} />
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: isDark ? '#1A1A1A' : '#F8F6F2' },
-            animation: 'slide_from_right',
-          }}
-        >
+        <Stack screenOptions={screenOptions}>
           <Stack.Screen name="chat" options={{ headerShown: false }} />
+          <Stack.Screen name="splash" options={{ headerShown: false }} />
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="login" options={{ headerShown: false }} />
+          <Stack.Screen name="onboarding" options={{ headerShown: false }} />
         </Stack>
 
         {menuVisible && (
           <Modal visible transparent animationType="none" onRequestClose={closeMenu}>
             <Pressable style={styles.overlay} onPress={closeMenu}>
               <Pressable style={StyleSheet.absoluteFill} onPress={() => {}}>
-                <Animated.View
-                  style={[
-                    styles.sidebar,
-                    {
-                      backgroundColor: isDark ? '#1A1A1A' : '#FFFFFF',
-                      width: drawerWidth,
-                      transform: [{ translateX: slideAnim }],
-                    },
-                  ]}
-                >
+                <Animated.View style={[styles.sidebar, { backgroundColor: isDark ? '#1A1A1A' : '#FFFFFF', width: drawerWidth, transform: [{ translateX: slideAnim }] }]}>
                   <SideMenu onClose={closeMenu} />
                 </Animated.View>
               </Pressable>
@@ -80,19 +93,10 @@ export default function Layout() {
 }
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
+  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' },
   sidebar: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-    shadowColor: "#000",
-    shadowOffset: { width: 2, height: 0 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 15,
+    position: 'absolute', left: 0, top: 0, bottom: 0,
+    shadowColor: "#000", shadowOffset: { width: 2, height: 0 },
+    shadowOpacity: 0.3, shadowRadius: 8, elevation: 15,
   },
 });
