@@ -16,28 +16,20 @@ export default function History() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState<string|null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const cancelledRef = useRef(false);
 
   const fetchConversations = useCallback(async (showRefresh=false)=>{
     if(!userId){ setLoading(false); return; }
     if(showRefresh) setRefreshing(true); else setLoading(true);
-    setError(null);
     try {
-      const { data, error:fetchError } = await supabase.from('conversations').select('*').eq('user_id',userId).order('updated_at',{ascending:false});
-      if(cancelledRef.current) return;
-      if(fetchError) throw fetchError;
-      setConversations(data||[]);
-    } catch(e){
-      if(!cancelledRef.current) setError(t('فشل تحميل المحادثات','Failed to load conversations'));
-    } finally {
-      if(!cancelledRef.current){ setLoading(false); setRefreshing(false); }
-    }
-  },[userId,isAr]);
+      const { data } = await supabase.from('conversations').select('*').eq('user_id',userId).order('updated_at',{ascending:false});
+      if(!cancelledRef.current) setConversations(data||[]);
+    } catch(e){ console.error(e); }
+    finally { if(!cancelledRef.current){ setLoading(false); setRefreshing(false); } }
+  },[userId]);
 
   useEffect(()=>{ cancelledRef.current=false; fetchConversations(); return ()=>{cancelledRef.current=true;}; },[fetchConversations]);
-  const onRefresh = useCallback(()=>fetchConversations(true),[fetchConversations]);
 
   const handleDelete = (convId:number)=>{ Alert.alert(t('حذف','Delete'),t('هل أنت متأكد؟','Are you sure?'),[ {text:t('إلغاء','Cancel'),style:'cancel'}, {text:t('حذف','Delete'),style:'destructive',onPress:async()=>{ await supabase.from('conversations').delete().eq('id',convId); setConversations(prev=>prev.filter(c=>c.id!==convId)); }} ]); };
 
@@ -57,7 +49,10 @@ export default function History() {
   const openConversation = async (conv:Conversation)=>{
     try {
       const { data:messages } = await supabase.from('conversation_messages').select('*').eq('conversation_id',conv.id).order('created_at',{ascending:true});
-      if(messages){ useTwinStore.getState().clearHistory(); messages.forEach((msg:any)=>{ useTwinStore.getState().addMessage(msg.role,msg.content); }); }
+      if(messages){
+        useTwinStore.getState().clearHistory();
+        messages.forEach((msg:any)=>{ useTwinStore.getState().addMessage({ role: msg.role, content: msg.content }); });
+      }
       router.push('/chat' as Href);
     } catch(e){ router.push('/chat' as Href); }
   };
@@ -74,25 +69,22 @@ export default function History() {
           <TextInput style={[s.searchInput,{color:txt}]} placeholder={t('بحث...','Search...')} placeholderTextColor={sub} value={searchQuery} onChangeText={setSearchQuery}/>
           {searchQuery.length>0&&<TouchableOpacity onPress={()=>setSearchQuery('')}><X size={18} stroke={sub}/></TouchableOpacity>}
         </View>
-        {error&&<Text style={{color:'#EF4444',textAlign:'center',marginBottom:12}}>{error}</Text>}
         <FlatList
           data={filtered} keyExtractor={(item)=>item.id.toString()}
           contentContainerStyle={{paddingBottom:40}}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#6B21A8']}/>}
-          ListEmptyComponent={<View style={{alignItems:'center',marginTop:60}}><MessageCircle size={48} stroke={sub}/><Text style={{color:sub,fontSize:17,fontWeight:'600',marginTop:16}}>{t('لا توجد محادثات','No conversations')}</Text><Text style={{color:sub,fontSize:14,marginTop:6,textAlign:'center'}}>{t('ابدأ أول محادثة','Start your first chat')}</Text></View>}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={()=>fetchConversations(true)} colors={['#6B21A8']}/>}
+          ListEmptyComponent={<View style={{alignItems:'center',marginTop:60}}><MessageCircle size={48} stroke={sub}/><Text style={{color:sub,fontSize:17,fontWeight:'600',marginTop:16}}>{t('لا توجد محادثات','No conversations')}</Text></View>}
           renderItem={({item})=>{
             const emotionIcon = EMOTION_ICONS[item.dominant_emotion]||'😐';
             return (
-              <TouchableOpacity style={[s.card,{backgroundColor:card,borderColor:border}]} onPress={()=>openConversation(item)} onLongPress={()=>handleDelete(item.id)} activeOpacity={0.8}>
+              <TouchableOpacity style={[s.card,{backgroundColor:card,borderColor:border}]} onPress={()=>openConversation(item)} onLongPress={()=>handleDelete(item.id)}>
                 <View style={[s.cardRow,isAr&&{flexDirection:'row-reverse'}]}>
                   <View style={s.emotionBadge}><Text style={{fontSize:20}}>{emotionIcon}</Text></View>
                   <View style={{flex:1}}>
                     <Text style={[s.cardTitle,{color:txt}]} numberOfLines={1}>{item.title}</Text>
-                    {item.summary&&<Text style={[s.cardSummary,{color:sub}]} numberOfLines={2}>{item.summary}</Text>}
-                    <View style={[s.metaRow,isAr&&{flexDirection:'row-reverse'}]}>
-                      <View style={s.metaItem}><Clock size={12} stroke={sub}/><Text style={[s.metaText,{color:sub}]}>{relativeTime(item.updated_at)}</Text></View>
-                      <View style={s.metaItem}><Brain size={12} stroke={sub}/><Text style={[s.metaText,{color:sub}]}>{item.memory_count} ذكريات</Text></View>
-                      {item.message_count>0&&<View style={s.metaItem}><MessageCircle size={12} stroke={sub}/><Text style={[s.metaText,{color:sub}]}>{item.message_count} رسالة</Text></View>}
+                    <View style={[s.metaRow]}>
+                      <Text style={[s.metaText,{color:sub}]}>{relativeTime(item.updated_at)}</Text>
+                      <Text style={[s.metaText,{color:sub}]}>{item.message_count} رسالة</Text>
                     </View>
                   </View>
                   {isAr?<ChevronLeft size={20} stroke={sub}/>:<ChevronRight size={20} stroke={sub}/>}
@@ -114,8 +106,6 @@ const s = StyleSheet.create({
   cardRow:{flexDirection:'row',alignItems:'center',gap:12},
   emotionBadge:{width:40,height:40,borderRadius:12,backgroundColor:'#F3F0FF',justifyContent:'center',alignItems:'center'},
   cardTitle:{fontSize:16,fontWeight:'600',marginBottom:4},
-  cardSummary:{fontSize:13,lineHeight:18,marginBottom:8},
-  metaRow:{flexDirection:'row',gap:12,flexWrap:'wrap'},
-  metaItem:{flexDirection:'row',alignItems:'center',gap:4},
+  metaRow:{flexDirection:'row',gap:8},
   metaText:{fontSize:12},
 });

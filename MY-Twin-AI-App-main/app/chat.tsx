@@ -25,7 +25,6 @@ import Markdown from 'react-native-markdown-display';
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const APP_ICON = require('../assets/icon.png');
 
-// ─ـ ألوان الثيم ────────────────────────────────────
 const COLORS = {
   light: {
     bg: '#FFFFFF', headerBg: '#FFFFFF', border: '#F0F0F0', text: '#1A1A1A',
@@ -45,30 +44,28 @@ const COLORS = {
   },
 };
 
-// ─ـ مكون Markdown ─────────────────────────────────
 const MarkdownRenderer = memo(({ content, isDark }: { content: string; isDark: boolean }) => {
-  const markdownStyles = {
+  const markdownStyles: any = {
     body: { color: isDark ? '#FFF' : '#1A1A1A', fontSize: 15, lineHeight: 24 },
-    heading1: { fontSize: 20, fontWeight: '700', marginBottom: 8, color: isDark ? '#FFF' : '#1A1A1A' },
-    heading2: { fontSize: 18, fontWeight: '700', marginBottom: 6, color: isDark ? '#FFF' : '#1A1A1A' },
-    heading3: { fontSize: 16, fontWeight: '600', marginBottom: 4, color: isDark ? '#FFF' : '#1A1A1A' },
+    heading1: { fontSize: 20, fontWeight: 'bold', marginBottom: 8, color: isDark ? '#FFF' : '#1A1A1A' },
+    heading2: { fontSize: 18, fontWeight: 'bold', marginBottom: 6, color: isDark ? '#FFF' : '#1A1A1A' },
+    heading3: { fontSize: 16, fontWeight: 'bold', marginBottom: 4, color: isDark ? '#FFF' : '#1A1A1A' },
     list_item: { marginBottom: 4 },
     bullet_list: { marginBottom: 8 },
     ordered_list: { marginBottom: 8 },
     table: { marginBottom: 8, borderWidth: 1, borderColor: isDark ? '#444' : '#E0E0E0' },
-    th: { padding: 6, backgroundColor: isDark ? '#333' : '#F5F5F5', fontWeight: '700' },
+    th: { padding: 6, backgroundColor: isDark ? '#333' : '#F5F5F5', fontWeight: 'bold' },
     td: { padding: 6, borderTopWidth: 1, borderColor: isDark ? '#444' : '#E0E0E0' },
     code_inline: { backgroundColor: isDark ? '#333' : '#F0F0F0', color: isDark ? '#FFF' : '#333', paddingHorizontal: 6, borderRadius: 4 },
     code_block: { backgroundColor: isDark ? '#222' : '#F0F0F0', padding: 10, borderRadius: 8, marginBottom: 8 },
     blockquote: { borderLeftWidth: 3, borderLeftColor: '#6B21A8', paddingLeft: 10, marginBottom: 8, backgroundColor: isDark ? '#2A2A2A' : '#F9F9F9' },
-    strong: { fontWeight: '700' },
+    strong: { fontWeight: 'bold' },
     em: { fontStyle: 'italic' },
     link: { color: '#6B21A8' },
   };
   return <Markdown style={markdownStyles}>{content}</Markdown>;
 });
 
-// ─ـ فقاعة المستخدم ─────────────────────────────────
 const UserBubble = memo(({ item, isDark }: { item: ChatMessage; isDark: boolean }) => (
   <View style={styles.userRow}>
     <View style={[styles.bubble, styles.userBubble, { backgroundColor: isDark ? COLORS.dark.bubbleUser : COLORS.light.bubbleUser }]}>
@@ -81,7 +78,6 @@ const UserBubble = memo(({ item, isDark }: { item: ChatMessage; isDark: boolean 
   </View>
 ));
 
-// ─ـ فقاعة التوأم (مع Markdown، بطاقات المشاعر والذاكرة) ──
 const TwinBubble = memo(({ item, isLast, pulseAnim, isDark, onCopy, onRetry, onRegenerate }: {
   item: ChatMessage; isLast: boolean; pulseAnim: Animated.Value; isDark: boolean;
   onCopy: (text: string) => void; onRetry: (msg: ChatMessage) => void;
@@ -90,21 +86,18 @@ const TwinBubble = memo(({ item, isLast, pulseAnim, isDark, onCopy, onRetry, onR
   const emotionEmoji: Record<string, string> = {
     joy: '😊', sadness: '😢', anger: '😠', fear: '😨', love: '❤️', surprise: '😮', neutral: '😌'
   };
-
   return (
     <View style={styles.twinRow}>
       <Animated.View style={{ transform: [{ scale: isLast ? pulseAnim : 1 }] }}>
         <Image source={APP_ICON} style={styles.avatar} />
       </Animated.View>
       <View style={styles.twinContent}>
-        {/* بطاقة Memory Recall */}
         {item.memoryRecall && (
           <View style={[styles.memoryBadge, { backgroundColor: isDark ? COLORS.dark.memoryBadgeBg : COLORS.light.memoryBadgeBg }]}>
             <Brain size={14} stroke={isDark ? COLORS.dark.memoryBadgeText : COLORS.light.memoryBadgeText} />
             <Text style={[styles.memoryBadgeText, { color: isDark ? COLORS.dark.memoryBadgeText : COLORS.light.memoryBadgeText }]}>Memory Recall</Text>
           </View>
         )}
-        {/* بطاقة المشاعر */}
         {item.emotion && (
           <View style={[styles.emotionTag, { backgroundColor: isDark ? COLORS.dark.emotionalTagBg : COLORS.light.emotionalTagBg }]}>
             <Text style={[styles.emotionTagText, { color: isDark ? COLORS.dark.emotionalTagText : COLORS.light.emotionalTagText }]}>
@@ -113,7 +106,6 @@ const TwinBubble = memo(({ item, isLast, pulseAnim, isDark, onCopy, onRetry, onR
           </View>
         )}
         <MarkdownRenderer content={item.content} isDark={isDark} />
-        {/* أزرار الإجراءات */}
         <View style={styles.actionRow}>
           <TouchableOpacity onPress={() => onCopy(item.content)} style={styles.actionBtn}>
             <Copy size={16} stroke={isDark ? '#999' : '#666'} />
@@ -144,16 +136,15 @@ const TwinBubble = memo(({ item, isLast, pulseAnim, isDark, onCopy, onRetry, onR
 export default function Chat() {
   const insets = useSafeAreaInsets();
   const {
-    userId, twinName, twinGender, tier, chatHistory, addMessage, updateBond,
-    updateRelationshipDims, calmMode, triggerHaptic, lang, theme, setTwinName,
+    userId, twinName, twinGender, tier, chatHistory, addMessage,
+    calmMode, triggerHaptic, lang, theme, setTwinName,
     setTwinGender, openMenu, closeMenu, voiceEnabled, setVoiceEnabled,
     setEnergy, bondLevel, relationshipDims, journeyPhase, attachmentStyle,
     twinStyle, replyStyle, setThinking, setThinkingStage
   } = useTwinStore((s) => ({
     userId: s.userId, twinName: s.twinName, twinGender: s.twinGender, tier: s.tier,
-    chatHistory: s.chatHistory, addMessage: s.addMessage, updateBond: s.updateBond,
-    updateRelationshipDims: s.updateRelationshipDims, calmMode: s.calmMode,
-    triggerHaptic: s.triggerHaptic, lang: s.lang, theme: s.theme,
+    chatHistory: s.chatHistory, addMessage: s.addMessage,
+    calmMode: s.calmMode, triggerHaptic: s.triggerHaptic, lang: s.lang, theme: s.theme,
     setTwinName: s.setTwinName, setTwinGender: s.setTwinGender,
     openMenu: s.openMenu, closeMenu: s.closeMenu,
     voiceEnabled: s.voiceEnabled, setVoiceEnabled: s.setVoiceEnabled,
@@ -173,14 +164,12 @@ export default function Chat() {
   const flatRef = useRef<FlatList<ChatMessage>>(null);
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const attachAnim = useRef(new Animated.Value(0)).current;
-  const abortRef = useRef<AbortController | null>(null);
 
   const colors = theme === 'dark' ? COLORS.dark : COLORS.light;
   const isRTL = lang === 'ar';
   const isDark = theme === 'dark';
   const isFree = tier === 'free';
 
-  // ─ـ المؤثرات ────────────────────────────────────
   useEffect(() => {
     if (chatHistory.length > 0 && chatHistory[chatHistory.length - 1]?.role === 'twin') {
       Animated.sequence([
@@ -203,21 +192,17 @@ export default function Chat() {
 
   const countryCode = (Localization.region || 'SA').toUpperCase();
 
-  // ✅ دالة الإرسال الرئيسية (مُبسَّطة)
   const sendMessage = useCallback(async (msg?: string, imageBase64?: string) => {
     const message = (msg || input).trim();
     if (!message && !imageBase64) return;
-
     const msgId = Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
     addMessage({ id: msgId, role: 'user', content: message || '📷 صورة', image: imageBase64, timestamp: Date.now() });
     setInput('');
     setLoading(true);
     setThinking(true);
     setThinkingStage('thinking');
-
     try {
       const response = await sendChatFromStore(message, imageBase64);
-      // إنشاء كائن الرسالة المُحسَّنة
       const enhancedMsg: ChatMessage = {
         id: Math.random().toString(36).substr(2, 9) + Date.now().toString(36),
         role: 'twin',
@@ -230,7 +215,6 @@ export default function Chat() {
         thinkingStage: response.thinking_stage,
       };
       addMessage(enhancedMsg);
-      // تحديث المتجر من الاستجابة
       updateStoreFromResponse(response);
       if (voiceEnabled) {
         try { await speakResponse(response.reply, { pitch: useTwinStore.getState().voicePitch, rate: useTwinStore.getState().voiceSpeed }); } catch {}
@@ -337,14 +321,11 @@ export default function Chat() {
     <View style={[styles.root, { paddingTop: insets.top, backgroundColor: colors.bg }]}>
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.bg} />
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        {/* Header */}
         <View style={[styles.header, { backgroundColor: colors.headerBg, borderBottomColor: colors.border }]}>
           <TouchableOpacity onPress={openMenu} style={styles.menuBtn}><Menu size={22} stroke={colors.text} /></TouchableOpacity>
           <View style={styles.headerCenter}><Text style={[styles.headerName, { color: colors.text }]} numberOfLines={1}>{twinName || (lang === 'ar' ? 'توأمك' : 'Your Twin')}</Text></View>
           <TouchableOpacity onPress={toggleSound} style={styles.soundBtn}>{voiceEnabled ? <Volume2 size={22} stroke={colors.text} /> : <VolumeX size={22} stroke={colors.subtext} />}</TouchableOpacity>
         </View>
-
-        {/* Chat List */}
         <FlatList
           ref={flatRef}
           data={chatHistory}
@@ -359,8 +340,6 @@ export default function Chat() {
           windowSize={5}
           keyboardDismissMode="interactive"
         />
-
-        {/* Input Bar */}
         <View style={[styles.inputBar, { backgroundColor: colors.headerBg, borderTopColor: colors.border }]}>
           <TouchableOpacity onPress={() => setShowAttach(true)} style={[styles.addBtn, { backgroundColor: colors.addBtnBg, borderColor: colors.addBtnBorder }]}>
             <Text style={[styles.addBtnText, { color: colors.sendActive }]}>+</Text>
@@ -380,7 +359,6 @@ export default function Chat() {
             {loading ? <ActivityIndicator size="small" color={colors.subtext} /> : <Image source={APP_ICON} style={{ width: 24, height: 24, borderRadius: 12 }} />}
           </TouchableOpacity>
         </View>
-        {/* Attach Menu Modal */}
         <Modal visible={showAttach} transparent animationType="none" onRequestClose={() => setShowAttach(false)}>
           <TouchableOpacity style={styles.attachOverlay} activeOpacity={1} onPress={() => setShowAttach(false)}>
             <Animated.View style={[styles.attachContainer, { backgroundColor: isDark ? '#2A2A2A' : '#FFF', transform: [{ translateY: attachAnim.interpolate({ inputRange: [0, 1], outputRange: [400, 0] }) }] }]}>
@@ -396,8 +374,6 @@ export default function Chat() {
             </Animated.View>
           </TouchableOpacity>
         </Modal>
-
-        {/* Feature Modal */}
         <Modal visible={featureModal.visible} transparent animationType="fade" onRequestClose={() => setFeatureModal({ visible: false, type: '' })}>
           <View style={styles.featureOverlay}>
             <View style={[styles.featureContainer, { backgroundColor: isDark ? '#2A2A2A' : '#FFF' }]}>

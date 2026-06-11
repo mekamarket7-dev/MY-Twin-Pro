@@ -148,8 +148,8 @@ export const useTwinStore = create<TwinStore>()(persist((set, get) => ({
     return { bondLevel: safeBond, badges };
   }),
 
-  updateRelationshipDims: (dims) => set((state) => ({
-    relationshipDims: { ...state.relationshipDims, ...dims }
+  updateRelationshipDims: (dims: any) => set((state) => ({
+    relationshipDims: { ...state.relationshipDims, ...(dims as any) }
   })),
 
   setEmotionState: (emotion) => set({ emotionState: emotion }),

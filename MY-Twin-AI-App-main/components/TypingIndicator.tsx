@@ -8,19 +8,16 @@ interface ThinkingStageConfig {
   label_ar: string;
   label_en: string;
   color: string;
-  animationSpeed: number;
 }
 
-// تكوين مراحل التفكير
 const THINKING_STAGES: Record<string, ThinkingStageConfig> = {
-  thinking:   { icon: Brain,    label_ar: 'أفكر...',          label_en: 'Thinking...',          color: '#A855F7', animationSpeed: 400 },
-  memory:     { icon: Database, label_ar: 'أسترجع ذكرياتنا...', label_en: 'Recalling memories...', color: '#3B82F6', animationSpeed: 500 },
-  emotion:    { icon: Heart,    label_ar: 'أفهم مشاعرك...',    label_en: 'Understanding you...',  color: '#EC4899', animationSpeed: 350 },
-  planning:   { icon: Target,   label_ar: 'أخطط للرد...',      label_en: 'Planning response...', color: '#F59E0B', animationSpeed: 300 },
-  searching:  { icon: Search,   label_ar: 'أبحث...',           label_en: 'Searching...',         color: '#10B981', animationSpeed: 450 },
+  thinking:   { icon: Brain,    label_ar: 'أفكر...',          label_en: 'Thinking...',          color: '#A855F7' },
+  memory:     { icon: Database, label_ar: 'أسترجع ذكرياتنا...', label_en: 'Recalling memories...', color: '#3B82F6' },
+  emotion:    { icon: Heart,    label_ar: 'أفهم مشاعرك...',    label_en: 'Understanding you...',  color: '#EC4899' },
+  planning:   { icon: Target,   label_ar: 'أخطط للرد...',      label_en: 'Planning response...', color: '#F59E0B' },
+  searching:  { icon: Search,   label_ar: 'أبحث...',           label_en: 'Searching...',         color: '#10B981' },
 };
 
-// أوصاف الشخصية
 const PERSONALITY_LABELS: Record<string, { ar: string; en: string }> = {
   wise:        { ar: 'الحكيم',   en: 'Wise' },
   fun:         { ar: 'المرح',    en: 'Fun' },
@@ -31,9 +28,7 @@ const PERSONALITY_LABELS: Record<string, { ar: string; en: string }> = {
 };
 
 export default function TypingIndicator() {
-  const {
-    lang, theme, twinName, twinStyle, isThinking, thinkingStage
-  } = useTwinStore((s) => ({
+  const { lang, theme, twinName, twinStyle, isThinking, thinkingStage } = useTwinStore((s) => ({
     lang: s.lang,
     theme: s.theme,
     twinName: s.twinName,
@@ -45,12 +40,7 @@ export default function TypingIndicator() {
   const isAr = lang === 'ar';
   const isDark = theme === 'dark';
 
-  // النقاط المتحركة
-  const dots = useRef([
-    new Animated.Value(0),
-    new Animated.Value(0),
-    new Animated.Value(0),
-  ]).current;
+  const dots = useRef([new Animated.Value(0), new Animated.Value(0), new Animated.Value(0)]).current;
 
   useEffect(() => {
     const animations = dots.map((dot, i) =>
@@ -66,47 +56,29 @@ export default function TypingIndicator() {
     return () => animations.forEach((a) => a.stop());
   }, [dots]);
 
-  // استخراج تكوين المرحلة الحالية
   const stage = THINKING_STAGES[thinkingStage] || THINKING_STAGES.thinking;
   const StageIcon = stage.icon;
   const stageLabel = isAr ? stage.label_ar : stage.label_en;
-
-  // وصف الشخصية
   const personality = PERSONALITY_LABELS[twinStyle] || null;
   const personalityLabel = personality ? (isAr ? personality.ar : personality.en) : '';
   const displayName = twinName || (isAr ? 'توأمك' : 'Your Twin');
-  const fullLabel = personalityLabel
-    ? `${displayName} ${personalityLabel}`
-    : displayName;
+  const fullLabel = personalityLabel ? `${displayName} ${personalityLabel}` : displayName;
 
   return (
-    <View style={styles.container} accessibilityRole="status" accessibilityLabel={stageLabel}>
-      <View style={[
-        styles.bubble,
-        { backgroundColor: isDark ? '#2A2A2A' : '#F3F0FF', borderColor: isDark ? '#444' : '#E0D9F5' },
-        isAr && styles.bubbleRTL
-      ]}>
-        {/* أيقونة مرحلة التفكير */}
+    <View style={styles.container}>
+      <View style={[styles.bubble, { backgroundColor: isDark ? '#2A2A2A' : '#F3F0FF', borderColor: isDark ? '#444' : '#E0D9F5' }, isAr && styles.bubbleRTL]}>
         <StageIcon size={20} stroke={stage.color} />
-
-        {/* نقاط متحركة */}
         <View style={[styles.dotsRow, isAr && styles.dotsRowRTL]}>
           {dots.map((dot, i) => (
             <Animated.View
               key={i}
-              style={[
-                styles.dot,
-                { backgroundColor: stage.color },
-                {
-                  opacity: dot.interpolate({ inputRange: [0, 1], outputRange: [0.3, 1] }),
-                  transform: [{ translateY: dot.interpolate({ inputRange: [0, 1], outputRange: [0, -8] }) }],
-                },
-              ]}
+              style={[styles.dot, { backgroundColor: stage.color }, {
+                opacity: dot.interpolate({ inputRange: [0, 1], outputRange: [0.3, 1] }),
+                transform: [{ translateY: dot.interpolate({ inputRange: [0, 1], outputRange: [0, -8] }) }],
+              }]}
             />
           ))}
         </View>
-
-        {/* النص */}
         <Text style={[styles.text, { color: isDark ? '#CCC' : '#666' }]} numberOfLines={1}>
           {fullLabel} {stageLabel}
         </Text>
@@ -116,37 +88,11 @@ export default function TypingIndicator() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: 16,
-    paddingBottom: 8,
-  },
-  bubble: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 18,
-    alignSelf: 'flex-start',
-    borderWidth: 1,
-    gap: 8,
-  },
-  bubbleRTL: {
-    flexDirection: 'row-reverse',
-  },
-  dotsRow: {
-    flexDirection: 'row',
-    gap: 3,
-  },
-  dotsRowRTL: {
-    flexDirection: 'row-reverse',
-  },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-  },
-  text: {
-    fontSize: 13,
-    fontWeight: '500',
-  },
+  container: { paddingHorizontal: 16, paddingBottom: 8 },
+  bubble: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, paddingHorizontal: 16, borderRadius: 18, alignSelf: 'flex-start', borderWidth: 1, gap: 8 },
+  bubbleRTL: { flexDirection: 'row-reverse' },
+  dotsRow: { flexDirection: 'row', gap: 3 },
+  dotsRowRTL: { flexDirection: 'row-reverse' },
+  dot: { width: 6, height: 6, borderRadius: 3 },
+  text: { fontSize: 13, fontWeight: '500' },
 });
